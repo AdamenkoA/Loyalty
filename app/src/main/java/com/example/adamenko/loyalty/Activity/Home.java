@@ -16,7 +16,7 @@ import android.view.MenuItem;
 
 import com.example.adamenko.loyalty.Crypter.StringCrypter;
 import com.example.adamenko.loyalty.Fragments.HomeFragment;
-import com.example.adamenko.loyalty.Fragments.TopicsFragment;
+import com.example.adamenko.loyalty.Fragments.TopicFragment;
 import com.example.adamenko.loyalty.Fragments.dummy.DummyContent;
 import com.example.adamenko.loyalty.R;
 
@@ -25,7 +25,7 @@ import java.io.File;
 import java.io.FileReader;
 
 public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,TopicsFragment.OnListFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener , TopicFragment.OnListFragmentInteractionListener {
 
     private static final int WHITE = 0xFFFFFFFF;
     private static final int BLACK = 0xFF000000;
@@ -75,7 +75,7 @@ public class Home extends AppCompatActivity
 
         Fragment fragment = null;
         Class fragmentClass;
-        fragmentClass = TopicsFragment.class;
+        fragmentClass = TopicFragment.class;
 
         try {
             fragment = (Fragment) fragmentClass.newInstance();
@@ -128,7 +128,7 @@ public class Home extends AppCompatActivity
         Class fragmentClass;
         switch (item.getItemId()) {
             case R.id.nav_topics:
-                fragmentClass = TopicsFragment.class;
+                fragmentClass = TopicFragment.class;
                 break;
             case R.id.nav_home:
                 fragmentClass = HomeFragment.class;
@@ -137,7 +137,7 @@ public class Home extends AppCompatActivity
 //                fragmentClass = ThirdFragment.class;
 //                break;
             default:
-                fragmentClass = TopicsFragment.class;
+                fragmentClass = HomeFragment.class;
 
         }
         try {

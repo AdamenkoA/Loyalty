@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "210475656488",
+    "firebase_url": "https://simpleloyalty-d0c8e.firebaseio.com",
+    "project_id": "simpleloyalty-d0c8e",
+    "storage_bucket": "simpleloyalty-d0c8e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:210475656488:android:23598c3cfe2480f8",
+        "android_client_info": {
+          "package_name": "com.example.adamenko.loyalty"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "210475656488-oejb6flfpi8p11n7i7ea33h0dc58m514.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.adamenko.loyalty",
+            "certificate_hash": "DAB0C7749FF4E2A695BD7F3ED9DAD25F3E588DE0"
+          }
+        },
+        {
+          "client_id": "210475656488-b7tdq6i5se5lb2b46rk049hefqj98m8h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHEcH2RHJ44ug1p9ukJasoMkDyOBp8YWU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "210475656488-b7tdq6i5se5lb2b46rk049hefqj98m8h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

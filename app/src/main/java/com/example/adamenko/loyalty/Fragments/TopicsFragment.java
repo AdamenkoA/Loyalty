@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.adamenko.loyalty.Adapters.MyTopicsRecyclerViewAdapter;
 import com.example.adamenko.loyalty.Fragments.dummy.DummyContent;
 import com.example.adamenko.loyalty.Fragments.dummy.DummyContent.DummyItem;
 import com.example.adamenko.loyalty.R;

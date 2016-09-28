@@ -32,7 +32,12 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
-        String barcode_data = "00000000";
+
+        String barcode_data = "0";
+        if (this.getArguments()==null){
+            barcode_data = "000000";
+        }
+        else barcode_data = this.getArguments().getString("message");
         // barcode image
         Bitmap bitmap = null;
         ImageView iv = (ImageView) rootView.findViewById(R.id.bar_code_view);

@@ -17,10 +17,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.adamenko.loyalty.Crypter.StringCrypter;
+import com.example.adamenko.loyalty.Fragments.EventsFragment;
 import com.example.adamenko.loyalty.Fragments.HomeFragment;
 import com.example.adamenko.loyalty.Fragments.Subscribe;
 import com.example.adamenko.loyalty.Fragments.TopicFragment;
-import com.example.adamenko.loyalty.Fragments.dummy.DummyContent;
+import com.example.adamenko.loyalty.Fragments.dummy.EventContent;
+import com.example.adamenko.loyalty.Fragments.dummy.TopicContent;
 import com.example.adamenko.loyalty.R;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -29,7 +31,7 @@ import java.io.File;
 import java.io.FileReader;
 
 public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener , TopicFragment.OnListFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener , TopicFragment.OnListFragmentInteractionListener , EventsFragment.OnListFragmentInteractionListener{
 
     private static final int WHITE = 0xFFFFFFFF;
     private static final int BLACK = 0xFF000000;
@@ -138,9 +140,9 @@ public class Home extends AppCompatActivity
             case R.id.nav_home:
                 fragmentClass = HomeFragment.class;
                 break;
-//            case R.id.nav_third_fragment:
-//                fragmentClass = ThirdFragment.class;
-//                break;
+            case R.id.nav_calendar:
+                fragmentClass = EventsFragment.class;
+                break;
             default:
                 fragmentClass = HomeFragment.class;
 
@@ -165,18 +167,18 @@ public class Home extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(final DummyContent item) {
+    public void onListFragmentInteraction(final TopicContent item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Are u shure?")
+        builder.setMessage(R.string.subscribe_to_topic)
                 .setTitle("Topic");
 
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(R.string.subscribe_yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
               FirebaseMessaging.getInstance().subscribeToTopic("topic_" + item.id);
                 new Subscribe(barCode,item.id);
             }
         });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.subscribe_no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User cancelled the dialog
             }
@@ -184,6 +186,11 @@ public class Home extends AppCompatActivity
 
         AlertDialog dialog = builder.create();
         dialog.show();
+
+    }
+
+    @Override
+    public void onListFragmentInteraction(EventContent item) {
 
     }
 }

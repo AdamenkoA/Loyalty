@@ -53,8 +53,8 @@ public class ListViewAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = inflater.inflate(R.layout.fragment_topic_list, parent, false);
             holder = new ViewHolder();
-            holder.txtViewTitle = (TextView) convertView.findViewById(R.id.id);
-            holder.txtViewDescription = (TextView) convertView.findViewById(R.id.content);
+            holder.txtViewTitle = (TextView) convertView.findViewById(R.id.id_topic);
+            holder.txtViewDescription = (TextView) convertView.findViewById(R.id.content_topic);
             convertView.setTag(holder);
 
         } else {

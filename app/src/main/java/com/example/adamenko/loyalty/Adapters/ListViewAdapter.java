@@ -1,5 +1,6 @@
 package com.example.adamenko.loyalty.Adapters;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +14,11 @@ import com.example.adamenko.loyalty.R;
  */
 
 public class ListViewAdapter extends BaseAdapter {
-    LayoutInflater context;
+    Activity context;
     String title[];
     String description[];
 
-    public ListViewAdapter(LayoutInflater context, String[] title, String[] description) {
+    public ListViewAdapter(Activity context, String[] title, String[] description) {
         super();
         this.context = context;
         this.title = title;
@@ -47,13 +48,15 @@ public class ListViewAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHolder holder;
+        LayoutInflater inflater = context.getLayoutInflater();
 
         if (convertView == null) {
-            convertView = context.inflate(R.layout.fragment_topic_list, parent, false);
+            convertView = inflater.inflate(R.layout.fragment_topic_list, parent, false);
             holder = new ViewHolder();
             holder.txtViewTitle = (TextView) convertView.findViewById(R.id.id);
             holder.txtViewDescription = (TextView) convertView.findViewById(R.id.content);
             convertView.setTag(holder);
+
         } else {
             holder = (ViewHolder) convertView.getTag();
         }

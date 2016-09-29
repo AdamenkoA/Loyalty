@@ -1,6 +1,8 @@
 package com.example.adamenko.loyalty.Activity;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -16,9 +18,11 @@ import android.view.MenuItem;
 
 import com.example.adamenko.loyalty.Crypter.StringCrypter;
 import com.example.adamenko.loyalty.Fragments.HomeFragment;
+import com.example.adamenko.loyalty.Fragments.Subscribe;
 import com.example.adamenko.loyalty.Fragments.TopicFragment;
 import com.example.adamenko.loyalty.Fragments.dummy.DummyContent;
 import com.example.adamenko.loyalty.R;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -30,11 +34,12 @@ public class Home extends AppCompatActivity
     private static final int WHITE = 0xFFFFFFFF;
     private static final int BLACK = 0xFF000000;
     private String fileName = R.string.file_name + "";
-    private String decryptedStr = "";
+    private String barCode = "";
     private String strLine = "";
     private ActionBarDrawerToggle mDrawerToggle;
     private HomeFragment mNavigationDrawerFragment;
     private StringCrypter crypter = new StringCrypter();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +65,7 @@ public class Home extends AppCompatActivity
                 FileReader fReader = new FileReader(tempFile);
                 BufferedReader bReader = new BufferedReader(fReader);
                 while ((strLine = bReader.readLine()) != null) {
-                    barcode_data = crypter.decrypt(strLine).toString();
+                     barcode_data = crypter.decrypt(strLine).toString();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -69,13 +74,13 @@ public class Home extends AppCompatActivity
 
         bundle.putString("message", barcode_data);
 
-
+        barCode= barcode_data;
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+        FirebaseMessaging.getInstance().subscribeToTopic("TopIc");
         Fragment fragment = null;
         Class fragmentClass;
-        fragmentClass = TopicFragment.class;
+        fragmentClass = HomeFragment.class;
 
         try {
             fragment = (Fragment) fragmentClass.newInstance();
@@ -160,7 +165,25 @@ public class Home extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void onListFragmentInteraction(final DummyContent item) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are u shure?")
+                .setTitle("Topic");
+
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+              FirebaseMessaging.getInstance().subscribeToTopic("topic_" + item.id);
+                new Subscribe(barCode,item.id);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
 
     }
 }

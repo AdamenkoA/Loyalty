@@ -92,10 +92,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             e.printStackTrace();
         }
 
-        Intent myIntent = new Intent(LoginActivity.this, Home.class);
-        myIntent.putExtra("ITEM_ID", decryptedStr);
-        startActivity(myIntent);
-        finish();
+//        Intent myIntent = new Intent(LoginActivity.this, Home.class);
+//        myIntent.putExtra("ITEM_ID", decryptedStr);
+//        startActivity(myIntent);
+//        finish();
         if (decryptedStr.equals("")) {
             mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
@@ -197,10 +197,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mProgressView = findViewById(R.id.login_progress);
         } else {
 
-//            Intent myIntent = new Intent(LoginActivity.this, Home.class);
-//            myIntent.putExtra("ITEM_ID", decryptedStr);
-//            startActivity(myIntent);
-//            finish();
+            Intent myIntent = new Intent(LoginActivity.this, Home.class);
+            myIntent.putExtra("ITEM_ID", decryptedStr);
+            startActivity(myIntent);
+            finish();
         }
 
 

@@ -42,39 +42,6 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
      */
     private void sendRegistrationToServer(String token) {
 
-//        AsyncHttpClient client = new AsyncHttpClient();
-//        HashMap<String, String> param = new HashMap<String, String>();
-//        param.put("name", "TEST");
-//        param.put("phone", "11111111111");
-//        param.put("token", token);
-//        param.put("app", "test");
-//
-//        RequestParams params = new RequestParams(param);
-//        client.post("https://safe-forest-50436.herokuapp.com/api/contacts", params, new AsyncHttpResponseHandler() {
-//            @Override
-//            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-//
-//                try {
-//                    String value = new String(responseBody);
-//                    String code = new String(responseBody, "UTF-8");
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-//
-//                try {
-//                    String value = new String(responseBody);
-//                    String code = new String(responseBody, "UTF-8");
-//                } catch (UnsupportedEncodingException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//        });
     }
 
 

@@ -25,7 +25,10 @@
     <string name="title_activity_subscribe">Subscribe</string>
 
     <!-- Strings related to Settings -->
-
+    <!-- Strings related to Subscribe -->
+    <string name="subscribe_to_topic">Хотите подписатся на эту тему?</string>
+    <string name="subscribe_yes">Да</string>
+    <string name="subscribe_no">Нет</string>
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
 

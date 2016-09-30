@@ -131,13 +131,13 @@ public class Home extends AppCompatActivity
         Class fragmentClass;
         Bundle bundle = new Bundle();
         switch (item.getItemId()) {
-            case R.id.nav_home:
+            case R.id.home_menu:
                 fragmentClass = HomeFragment.class;
                 break;
-            case R.id.nav_calendar:
+            case R.id.event_menu:
                 fragmentClass = EventsFragment.class;
                 break;
-            case R.id.nav_topics:
+            case R.id.topic_menu:
                 fragmentClass = TopicFragment.class;
                 break;
             default:

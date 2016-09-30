@@ -2,17 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_home"
+            android:id="@+id/home_menu"
             android:icon="@drawable/ic_menu_send"
-            android:title="Home" />
+            android:title="Главная" />
         <item
-            android:id="@+id/nav_calendar"
+            android:id="@+id/event_menu"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Calendar" />
+            android:title="События" />
         <item
-            android:id="@+id/nav_topics"
+            android:id="@+id/topic_menu"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Topics" />
+            android:title="Темы" />
     </group>
 
 </menu>

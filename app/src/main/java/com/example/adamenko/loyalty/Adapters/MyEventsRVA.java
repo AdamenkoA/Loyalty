@@ -1,4 +1,4 @@
-package com.example.adamenko.loyalty.Fragments;
+package com.example.adamenko.loyalty.Adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,23 +7,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.adamenko.loyalty.Fragments.EventsFragment.OnListFragmentInteractionListener;
-import com.example.adamenko.loyalty.Fragments.dummy.DummyContent.DummyItem;
-import com.example.adamenko.loyalty.Fragments.dummy.EventContent;
+import com.example.adamenko.loyalty.Content.EventContent;
 import com.example.adamenko.loyalty.R;
 
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
- * specified {@link OnListFragmentInteractionListener}.
- * TODO: Replace the implementation with code for your data type.
- */
-public class MyEventsRecyclerViewAdapter extends RecyclerView.Adapter<MyEventsRecyclerViewAdapter.ViewHolder> {
+public class MyEventsRVA extends RecyclerView.Adapter<MyEventsRVA.ViewHolder> {
 
     private final List<EventContent> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyEventsRecyclerViewAdapter(List<EventContent> items, OnListFragmentInteractionListener listener) {
+    public MyEventsRVA(List<EventContent> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }

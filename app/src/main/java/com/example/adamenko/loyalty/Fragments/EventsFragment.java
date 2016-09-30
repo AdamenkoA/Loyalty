@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.adamenko.loyalty.Fragments.dummy.EventContent;
+import com.example.adamenko.loyalty.Content.EventContent;
 import com.example.adamenko.loyalty.R;
 import com.example.adamenko.loyalty.Request.EventReq;
 

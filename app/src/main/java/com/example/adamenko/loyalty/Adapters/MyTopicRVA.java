@@ -1,4 +1,4 @@
-package com.example.adamenko.loyalty.Fragments;
+package com.example.adamenko.loyalty.Adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,17 +7,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.adamenko.loyalty.Fragments.TopicFragment.OnListFragmentInteractionListener;
-import com.example.adamenko.loyalty.Fragments.dummy.TopicContent;
+import com.example.adamenko.loyalty.Content.TopicContent;
 import com.example.adamenko.loyalty.R;
 
 import java.util.List;
 
-public class MyTopicRecyclerViewAdapter extends RecyclerView.Adapter<MyTopicRecyclerViewAdapter.ViewHolder> {
+public class MyTopicRVA extends RecyclerView.Adapter<MyTopicRVA.ViewHolder> {
 
     private final List<TopicContent> mValues;
     private final OnListFragmentInteractionListener mListener;
 
-    public MyTopicRecyclerViewAdapter(List<TopicContent> items, OnListFragmentInteractionListener listener) {
+    public MyTopicRVA(List<TopicContent> items, OnListFragmentInteractionListener listener) {
         mValues = items;
         mListener = listener;
     }

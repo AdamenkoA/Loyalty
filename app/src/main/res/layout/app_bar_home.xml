@@ -20,7 +20,8 @@
             android:theme="?attr/actionBarTheme"
             android:minHeight="?attr/actionBarSize"
             android:id="@+id/toolbar"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:clickable="true" />
     </android.support.design.widget.AppBarLayout>
 
     <include layout="@layout/content_home" />

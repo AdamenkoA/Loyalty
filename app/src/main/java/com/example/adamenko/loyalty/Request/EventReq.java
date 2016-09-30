@@ -3,8 +3,8 @@ package com.example.adamenko.loyalty.Request;
 import android.support.v7.widget.RecyclerView;
 
 import com.example.adamenko.loyalty.Fragments.EventsFragment;
-import com.example.adamenko.loyalty.Fragments.MyEventsRecyclerViewAdapter;
-import com.example.adamenko.loyalty.Fragments.dummy.EventContent;
+import com.example.adamenko.loyalty.Adapters.MyEventsRVA;
+import com.example.adamenko.loyalty.Content.EventContent;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -58,7 +58,7 @@ public class EventReq {
                     }
 
                     //   ListViewAdapter lviewAdapter = new ListViewAdapter(context,title,description);
-                    recyclerView.setAdapter(new MyEventsRecyclerViewAdapter(items, mListener));
+                    recyclerView.setAdapter(new MyEventsRVA(items, mListener));
                     //  listView.setAdapter(lviewAdapter);
                 } catch (JSONException e) {
                     e.printStackTrace();

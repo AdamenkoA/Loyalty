@@ -1,4 +1,4 @@
-package com.example.adamenko.loyalty.Fragments.dummy;
+package com.example.adamenko.loyalty.Content;
 
 /**
  * Created by Adamenko on 29.09.2016.

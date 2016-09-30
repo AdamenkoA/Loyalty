@@ -2,9 +2,9 @@ package com.example.adamenko.loyalty.Request;
 
 import android.support.v7.widget.RecyclerView;
 
-import com.example.adamenko.loyalty.Fragments.MyTopicRecyclerViewAdapter;
+import com.example.adamenko.loyalty.Adapters.MyTopicRVA;
 import com.example.adamenko.loyalty.Fragments.TopicFragment;
-import com.example.adamenko.loyalty.Fragments.dummy.TopicContent;
+import com.example.adamenko.loyalty.Content.TopicContent;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -50,7 +50,7 @@ public class Topic  {
                         }
 
                      //   ListViewAdapter lviewAdapter = new ListViewAdapter(context,title,description);
-                        recyclerView.setAdapter(new MyTopicRecyclerViewAdapter(items, mListener));
+                        recyclerView.setAdapter(new MyTopicRVA(items, mListener));
                       //  listView.setAdapter(lviewAdapter);
                     } catch (JSONException e) {
                         e.printStackTrace();

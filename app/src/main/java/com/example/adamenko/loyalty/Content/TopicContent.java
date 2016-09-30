@@ -1,4 +1,4 @@
-package com.example.adamenko.loyalty.Fragments.dummy;
+package com.example.adamenko.loyalty.Content;
 
 /**
  * Helper class for providing sample content for user interfaces created by

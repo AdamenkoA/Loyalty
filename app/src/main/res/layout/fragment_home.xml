@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.example.adamenko.loyalty.Fragments.HomeFragment">
-    <include layout="@layout/app_bar_home" />
 
     <ImageView
         android:layout_width="match_parent"

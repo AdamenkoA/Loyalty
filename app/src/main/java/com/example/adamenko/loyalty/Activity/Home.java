@@ -142,7 +142,6 @@ public class Home extends AppCompatActivity
                 break;
             default:
                 fragmentClass = HomeFragment.class;
-
         }
         try {
             fragment = (Fragment) fragmentClass.newInstance();
@@ -153,14 +152,13 @@ public class Home extends AppCompatActivity
         if (bundle != null) {
             fragment.setArguments(bundle);
         }
-        // Insert the fragment by replacing any existing fragment
+
+        setTitle(item.getTitle());
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-        // Highlight the selected item has been done by NavigationView
+
         item.setChecked(true);
-        // Set action bar title
-        setTitle(item.getTitle());
-        // Close the navigation drawer
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

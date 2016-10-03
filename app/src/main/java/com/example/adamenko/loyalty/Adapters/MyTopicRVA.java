@@ -32,8 +32,8 @@ public class MyTopicRVA extends RecyclerView.Adapter<MyTopicRVA.ViewHolder> {
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mIdView.setText(mValues.get(position).content);
-        holder.mContentView.setText(mValues.get(position).details);
+        holder.mIdView.setText(mValues.get(position).title);
+        holder.mContentView.setText(mValues.get(position).description);
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override

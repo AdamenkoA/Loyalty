@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import com.example.adamenko.loyalty.Content.EventContent;
 import com.example.adamenko.loyalty.Content.TopicContent;
 import com.example.adamenko.loyalty.Crypter.StringCrypter;
+import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.Fragments.EventsFragment;
 import com.example.adamenko.loyalty.Fragments.HomeFragment;
 import com.example.adamenko.loyalty.Fragments.Subscribe;
@@ -77,18 +78,26 @@ public class Home extends AppCompatActivity
         if (barcode_data.equals("")) {
             barcode_data = "1010101";
         }
+        MySQLiteHelper db=new MySQLiteHelper(this);
+        barCode= db.getSettings("BarCode").getValue();
         barCode = barcode_data;
-//        Bitmap bitmap = null;
-//        ImageView iv = (ImageView) findViewById(R.id.bar_code_view);
-//
-//        try {
-//            EncodeAsBitmap eab=new EncodeAsBitmap();
-//            bitmap =  eab.encodeAsBitmap(barcode_data, BarcodeFormat.CODE_128, 600, 300);
-//            iv.setImageBitmap(bitmap);
-//
-//        } catch (WriterException e) {
-//            e.printStackTrace();
-//        }
+        Fragment fragment = null;
+        Bundle bundle = new Bundle();
+
+        try {
+            fragment = HomeFragment.class.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        bundle.putString("message", barCode);
+        if (bundle != null) {
+            fragment.setArguments(bundle);
+        }
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        drawer.closeDrawer(GravityCompat.START);
+
     }
 
     @Override
@@ -173,8 +182,8 @@ public class Home extends AppCompatActivity
 
         builder.setPositiveButton(R.string.subscribe_yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                FirebaseMessaging.getInstance().subscribeToTopic("topic_" + item.id);
-                new Subscribe(barCode, item.id);
+                FirebaseMessaging.getInstance().subscribeToTopic("topic_" + item.getId());
+                new Subscribe(barCode, item.getId()+"");
             }
         });
         builder.setNegativeButton(R.string.subscribe_no, new DialogInterface.OnClickListener() {

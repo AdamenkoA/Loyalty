@@ -23,8 +23,6 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_subscribe">Subscribe</string>
-
-    <!-- Strings related to Settings -->
     <!-- Strings related to Subscribe -->
     <string name="subscribe_to_topic">Хотите подписатся на эту тему?</string>
     <string name="subscribe_yes">Да</string>
@@ -108,5 +106,21 @@
     <string name="title_activity_main2">Main2Activity</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_home">Home</string>
+
+        <string name="DB_Settings">CREATE TABLE Settings (
+                id INTEGER PRIMARY KEY,
+                key TEXT,
+                value TEXT ) </string>
+        <string name="DB_Events">CREATE TABLE Events (
+                id INTEGER PRIMARY KEY,
+                topicId INTEGER,
+                date TEXT,
+                time TEXT,
+                title TEXT,
+                description TEXT ) </string>
+        <string name="DB_Topics">CREATE TABLE Topics (
+                id INTEGER PRIMARY KEY,
+                title TEXT,
+                description TEXT ) </string>
 
 </resources>

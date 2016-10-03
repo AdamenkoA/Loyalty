@@ -27,7 +27,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.adamenko.loyalty.Content.SettingsContent;
 import com.example.adamenko.loyalty.Crypter.StringCrypter;
+import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.R;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -76,11 +78,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private String strLine = "";
     private StringCrypter crypter = new StringCrypter();
     private Intent mIntent = new Intent();
+    private   MySQLiteHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         try {
             File tempFile = new File(getBaseContext().getCacheDir().getPath() + "/" + fileName);
             FileReader fReader = new FileReader(tempFile);
@@ -91,6 +95,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } catch (Exception e) {
             e.printStackTrace();
         }
+        db = new MySQLiteHelper(this);
+
 
         Intent myIntent = new Intent(LoginActivity.this, Home.class);
         myIntent.putExtra("ITEM_ID", decryptedStr);
@@ -280,11 +286,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             StringCrypter crypter = new StringCrypter();
                             String encBase64Str = crypter.encrypt(barCode);
                             writer.write(encBase64Str);
+
                             writer.close();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-
+                        db.addSettings(new SettingsContent(1,"BarCode",barCode));
                         Intent myIntent = new Intent(LoginActivity.this, Home.class);
                         myIntent.putExtra("ITEM_ID", barCode);
                         startActivity(myIntent);

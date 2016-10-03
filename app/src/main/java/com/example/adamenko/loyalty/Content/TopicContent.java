@@ -8,20 +8,58 @@ package com.example.adamenko.loyalty.Content;
  */
 public class TopicContent {
 
+    public Integer getId() {
+        return id;
+    }
 
-    public final String id;
-    public final String content;
-    public final String details;
-
-    public TopicContent(String id, String content, String details) {
+    public void setId(Integer id) {
         this.id = id;
-        this.content = content;
-        this.details = details;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    private Integer id;
+
+    public TopicContent() {
+    }
+
+    private String title;
+    private String description;
+
+    public TopicContent(Integer id, String title, String description, Boolean subscribe) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.subscribe = subscribe;
+    }
+
+    private Boolean subscribe;
+
+    public Boolean getSubscribe() {
+        return subscribe;
+    }
+
+    public void setSubscribe(Boolean subscribe) {
+        this.subscribe = subscribe;
     }
 
     @Override
     public String toString() {
-        return content;
+        return description;
     }
 
 }

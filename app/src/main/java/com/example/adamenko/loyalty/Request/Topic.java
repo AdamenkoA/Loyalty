@@ -46,7 +46,7 @@ public class Topic  {
                             id= actor.getString("id");
                             title= actor.getString("title");
                             description= actor.getString("description");
-                            items.add(new TopicContent(id,title,description));
+                            items.add(new TopicContent(Integer.parseInt(id),title,description));
                         }
 
                      //   ListViewAdapter lviewAdapter = new ListViewAdapter(context,title,description);

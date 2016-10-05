@@ -9,4 +9,5 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.example.adamenko.loyalty.Fragments.TopicFragment"
-    tools:listitem="@layout/fragment_event"/>
+    tools:listitem="@layout/fragment_event"
+    android:divider="@android:color/holo_green_dark"/>

@@ -25,7 +25,7 @@ public class Subscribe {
         param.put("topic",id);
         param.put("app", "AIzaSyB2zA4TL9napLFnR0cNI_I9gcdfg9qmZ6g");
         RequestParams params = new RequestParams(param);
-        client.post("https://safe-forest-50436.herokuapp.com/api/subscribe", params, new AsyncHttpResponseHandler() {
+        client.post("https://simpletech-loyalty.herokuapp.com/api/subscribe", params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {

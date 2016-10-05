@@ -2,8 +2,10 @@ package com.example.adamenko.loyalty.Fragments;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -70,7 +72,8 @@ public class TopicFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-           new Topic(recyclerView,mListener);
+            Drawable dividerDrawable = ContextCompat.getDrawable(context, R.drawable.divider);
+           new Topic(recyclerView,mListener,dividerDrawable);
         }
         return view;
     }

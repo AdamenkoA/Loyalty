@@ -19,7 +19,6 @@ import android.view.MenuItem;
 import com.example.adamenko.loyalty.Content.EventContent;
 import com.example.adamenko.loyalty.Content.TopicContent;
 import com.example.adamenko.loyalty.Crypter.StringCrypter;
-import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.Fragments.EventsFragment;
 import com.example.adamenko.loyalty.Fragments.HomeFragment;
 import com.example.adamenko.loyalty.Fragments.Subscribe;
@@ -78,8 +77,8 @@ public class Home extends AppCompatActivity
         if (barcode_data.equals("")) {
             barcode_data = "1010101";
         }
-        MySQLiteHelper db=new MySQLiteHelper(this);
-        barCode= db.getSettings("BarCode").getValue();
+     //   MySQLiteHelper db=new MySQLiteHelper(this);
+      //  barCode= db.getSettings("BarCode").getValue();
         barCode = barcode_data;
         Fragment fragment = null;
         Bundle bundle = new Bundle();

@@ -32,10 +32,10 @@ public class MyEventsRVA extends RecyclerView.Adapter<MyEventsRVA.ViewHolder> {
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         holder.mItem = mValues.get(position);
-        holder.mDate.setText(mValues.get(position).date);
-        holder.mTime.setText(mValues.get(position).time);
-        holder.mTitle.setText(mValues.get(position).title);
-        holder.mDescription.setText(mValues.get(position).description);
+        holder.mDate.setText(mValues.get(position).getDate());
+        holder.mTime.setText(mValues.get(position).getTime());
+        holder.mTitle.setText(mValues.get(position).getTitle());
+    //    holder.mDescription.setText(mValues.get(position).getDescription());
 
 
 
@@ -61,7 +61,7 @@ public class MyEventsRVA extends RecyclerView.Adapter<MyEventsRVA.ViewHolder> {
         public final TextView mDate;
         public final TextView mTime;
         public final TextView mTitle;
-        public final TextView mDescription;
+       // public final TextView mDescription;
         public EventContent mItem;
 
         public ViewHolder(View view) {
@@ -70,7 +70,7 @@ public class MyEventsRVA extends RecyclerView.Adapter<MyEventsRVA.ViewHolder> {
             mDate = (TextView) view.findViewById(R.id.date_event);
             mTime = (TextView) view.findViewById(R.id.time_event);
             mTitle = (TextView) view.findViewById(R.id.title_event);
-            mDescription = (TextView) view.findViewById(R.id.description_event);
+           // mDescription = (TextView) view.findViewById(R.id.description_event);
 
         }
 

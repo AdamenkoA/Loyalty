@@ -35,37 +35,31 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String KEY_TIME = "time";
 
     private static final String[] COLUMNS = {KEY_ID, KEY_TITLE};
-
+  public  String CREATE_TABLE="";
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        CREATE_TABLE=context.getResources().getString(R.string.DB_Settings);
+
 
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         // SQL statement to create book table
-        String CREATE_BOOK_TABLE = "";
-        for (int i=0;i<=2;i++) {
-            switch (i) {
-                case 0:
-                    CREATE_BOOK_TABLE = R.string.DB_Settings + "";
-                case 1:
-                    CREATE_BOOK_TABLE = R.string.DB_Events + "";
-                case 2:
-                    CREATE_BOOK_TABLE = R.string.DB_Topics + "";
-
-            }
-            // create books table
-            db.execSQL(CREATE_BOOK_TABLE);
+        try {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
+            db.execSQL(CREATE_TABLE);
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older books table if existed
-        db.execSQL("DROP TABLE IF EXISTS books");
-
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
         // create fresh books table
         this.onCreate(db);
     }

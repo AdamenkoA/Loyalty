@@ -3,7 +3,7 @@ package com.example.adamenko.loyalty.Activity;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.LoaderManager.LoaderCallbacks;
+import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -25,8 +25,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.adamenko.loyalty.Content.SettingsContent;
 import com.example.adamenko.loyalty.Crypter.StringCrypter;
 import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.R;
@@ -52,9 +52,10 @@ import java.util.List;
 import cz.msebera.android.httpclient.Header;
 
 /**
- * A login screen that offers login via email/password.
+ * Created by Adamenko on 05.10.2016.
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+
+public class Test extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -77,7 +78,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private String strLine = "";
     private StringCrypter crypter = new StringCrypter();
     private Intent mIntent = new Intent();
-    private   MySQLiteHelper db;
+    private MySQLiteHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,13 +95,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        db = new MySQLiteHelper(this);
-//        db.addSettings(new SettingsContent(1,"BarCode","1010101"));
-//
-//        Intent myIntent = new Intent(LoginActivity.this, Home.class);
-//        myIntent.putExtra("ITEM_ID", decryptedStr);
-//        startActivity(myIntent);
-//        finish();
+        db = new MySQLiteHelper(this);
+        db.addSettings(new SettingsContent(1,"BarCode","1010101"));
+
+        Intent myIntent = new Intent(Test.this, Home.class);
+        myIntent.putExtra("ITEM_ID", decryptedStr);
+        startActivity(myIntent);
+        finish();
         if (decryptedStr.equals("")) {
             mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
@@ -200,14 +201,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             mLoginFormView = findViewById(R.id.login_form);
             mProgressView = findViewById(R.id.login_progress);
-        } else {
-
-            Intent myIntent = new Intent(LoginActivity.this, Home.class);
-            myIntent.putExtra("ITEM_ID", decryptedStr);
-            startActivity(myIntent);
-            finish();
         }
-
 
     }
 
@@ -266,9 +260,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             client.post("https://simpletech-loyalty.herokuapp.com/api/contacts", params, new AsyncHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    Toast.makeText(com.example.adamenko.loyalty.Activity.LoginActivity.this,
-                            "Success", Toast.LENGTH_SHORT).show();
-                    try {
+                                      try {
                         String value = new String(responseBody);
                         JSONObject valueTrue = new JSONObject(value);
                         String barCode = new JSONObject(valueTrue.getString("contact")).getString("code");
@@ -290,8 +282,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                  //      db.addSettings(new SettingsContent(1,"BarCode",barCode));
-                        Intent myIntent = new Intent(LoginActivity.this, Home.class);
+                        //      db.addSettings(new SettingsContent(1,"BarCode",barCode));
+                        Intent myIntent = new Intent(Test.this, Home.class);
                         myIntent.putExtra("ITEM_ID", barCode);
                         startActivity(myIntent);
                         finish();
@@ -304,7 +296,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                    Toast.makeText(com.example.adamenko.loyalty.Activity.LoginActivity.this, "Error" + statusCode + "", Toast.LENGTH_SHORT).show();
+
                     try {
                         String value = new String(responseBody);
                         String code = new String(responseBody, "UTF-8");
@@ -357,7 +349,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         return new CursorLoader(this,
                 // Retrieve data rows for the device user's 'profile' contact.
                 Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), com.example.adamenko.loyalty.Activity.LoginActivity.ProfileQuery.PROJECTION,
+                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), com.example.adamenko.loyalty.Activity.Test.ProfileQuery.PROJECTION,
 
                 // Select only email addresses.
                 ContactsContract.Contacts.Data.MIMETYPE +
@@ -374,7 +366,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         List<String> emails = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(com.example.adamenko.loyalty.Activity.LoginActivity.ProfileQuery.ADDRESS));
+            emails.add(cursor.getString(com.example.adamenko.loyalty.Activity.Test.ProfileQuery.ADDRESS));
             cursor.moveToNext();
         }
 
@@ -389,7 +381,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(com.example.adamenko.loyalty.Activity.LoginActivity.this,
+                new ArrayAdapter<>(Test.this,
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         mEmailView.setAdapter(adapter);

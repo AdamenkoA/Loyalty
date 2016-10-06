@@ -190,7 +190,6 @@ public class Home extends AppCompatActivity
                 // User cancelled the dialog
             }
         });
-
         AlertDialog dialog = builder.create();
         dialog.show();
 

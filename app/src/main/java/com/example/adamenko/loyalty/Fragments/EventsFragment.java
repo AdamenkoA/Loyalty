@@ -12,9 +12,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.adamenko.loyalty.Adapters.MyEventsRVA;
 import com.example.adamenko.loyalty.Content.EventContent;
+import com.example.adamenko.loyalty.Decoration.DividerItemDecoration;
+import com.example.adamenko.loyalty.OnMyRequestListener;
 import com.example.adamenko.loyalty.R;
-import com.example.adamenko.loyalty.Request.EventReq;
+import com.example.adamenko.loyalty.Request.RequestFroAll;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * A fragment representing a list of Items.
@@ -23,21 +39,15 @@ import com.example.adamenko.loyalty.Request.EventReq;
  * interface.
  */
 public class EventsFragment extends Fragment {
-
-    // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
     private int mColumnCount = 1;
+    Drawable dividerDrawable;
+    RecyclerView recyclerView;
     private OnListFragmentInteractionListener mListener;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public EventsFragment() {
     }
 
-    // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
     public static EventsFragment newInstance(int columnCount) {
         EventsFragment fragment = new EventsFragment();
@@ -64,18 +74,68 @@ public class EventsFragment extends Fragment {
         // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
+            recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            Drawable dividerDrawable = ContextCompat.getDrawable(context, R.drawable.divider);
-         new EventReq(recyclerView,mListener,dividerDrawable);
+            dividerDrawable = ContextCompat.getDrawable(context, R.drawable.divider);
+            HashMap<String, String> param = new HashMap<String, String>();
+            param.put("app", "AIzaSyB2zA4TL9napLFnR0cNI_I9gcdfg9qmZ6g");
+            new RequestFroAll(param, "events", new OnMyRequestListener() {
+                @Override
+                public void onSuccess(JSONObject valueTrue) {
+                    String id;
+                    String topicId;
+                    String date;
+                    String time;
+                    String title;
+                    Date dateF = new Date();
+                    String description;
+                    List<EventContent> items = new ArrayList<EventContent>();
+
+                    JSONArray cast = null;
+                    try {
+                        cast = valueTrue.getJSONArray("events");
+                        for (int i = 0; i < cast.length(); i++) {
+                            JSONObject actor = cast.getJSONObject(i);
+                            id = actor.getString("id");
+                            topicId = actor.getString("topic_id");
+                            title = actor.getString("title");
+
+                            DateFormat df = new SimpleDateFormat("dd.MM");
+                            String string = "January 2, 2010";
+                            DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+
+                            try {
+                                dateF = format.parse(actor.getString("date"));
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            date = df.format(dateF) + "";
+                            time = actor.getString("time");
+                            description = actor.getString("description");
+                            items.add(new EventContent(id, topicId, date, time, title, description));
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    recyclerView.setAdapter(new MyEventsRVA(items, mListener));
+                    RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
+                    recyclerView.addItemDecoration(dividerItemDecoration);
+                }
+
+                @Override
+                public void onFailure(String value) {
+
+                }
+            });
         }
         return view;
     }
-
 
     @Override
     public void onAttach(Context context) {
@@ -94,16 +154,6 @@ public class EventsFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(EventContent item);
     }

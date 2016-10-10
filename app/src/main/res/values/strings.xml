@@ -13,6 +13,7 @@
     <string name="error_incorrect_password">This number is incorrect</string>
     <string name="error_field_required">Обязательно для заполнения</string>
     <string name="file_name">"1D10EN26"</string>
+    <string name="app">"AIzaSyB2zA4TL9napLFnR0cNI_I9gcdfg9qmZ6g"</string>
     <string name="log_token">Log Token</string>
     <string name="msg_token_fmt" translatable="false">InstanceID Token: %s</string>
     <string name="msg_subscribed">Subscribed</string>

@@ -7,7 +7,6 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -27,81 +26,42 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.adamenko.loyalty.Content.SettingsContent;
 import com.example.adamenko.loyalty.Crypter.StringCrypter;
 import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
+import com.example.adamenko.loyalty.OnMyRequestListener;
 import com.example.adamenko.loyalty.R;
+import com.example.adamenko.loyalty.Request.RequestToHeroku;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
-
-/**
- * A login screen that offers login via email/password.
- */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
-
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private com.example.adamenko.loyalty.Activity.LoginActivity.UserLoginTask mAuthTask = null;
-    private SharedPreferences sPref;
-    final String SAVED_TEXT = "saved";
-    // UI references.
+
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    private String fileName = R.string.file_name + "";
-    private String decryptedStr = "";
-    private String strLine = "";
-    private StringCrypter crypter = new StringCrypter();
-    private Intent mIntent = new Intent();
-    private   MySQLiteHelper db;
+    private MySQLiteHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        try {
-            File tempFile = new File(getBaseContext().getCacheDir().getPath() + "/" + fileName);
-            FileReader fReader = new FileReader(tempFile);
-            BufferedReader bReader = new BufferedReader(fReader);
-            while ((strLine = bReader.readLine()) != null) {
-                decryptedStr = crypter.decrypt(strLine).toString();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-//        db = new MySQLiteHelper(this);
-//        db.addSettings(new SettingsContent(1,"BarCode","1010101"));
-//
-//        Intent myIntent = new Intent(LoginActivity.this, Home.class);
-//        myIntent.putExtra("ITEM_ID", decryptedStr);
-//        startActivity(myIntent);
-//        finish();
-        if (decryptedStr.equals("")) {
+        db = new MySQLiteHelper(this);
+
+        if (db.getSettings("BarCode").equals("")) {
             mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
             mPasswordView = (EditText) findViewById(R.id.password);
@@ -124,11 +84,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                     cursorComplement = s.length() - mEmailView.getSelectionStart();
-                    if (count > after) {
-                        backspacingFlag = true;
-                    } else {
-                        backspacingFlag = false;
-                    }
+                    backspacingFlag = count > after;
                 }
 
                 @Override
@@ -161,11 +117,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                     cursorComplement = s.length() - mPasswordView.getSelectionStart();
-                    if (count > after) {
-                        backspacingFlag = true;
-                    } else {
-                        backspacingFlag = false;
-                    }
+                    backspacingFlag = count > after;
                 }
 
                 @Override
@@ -178,7 +130,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     String string = s.toString();
                     String phone = string.replaceAll("[^\\d]", "");
                     if (!editedFlag) {
-                        if (phone.length() >= 11 && !backspacingFlag) {
+                        if (phone.length() >= 12 && !backspacingFlag) {
                             editedFlag = true;
                             String ans = phone.substring(0, 1) + "(" + phone.substring(1, 4) + ")" + phone.substring(4);
                             mPasswordView.setText(ans);
@@ -203,7 +155,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
 
             Intent myIntent = new Intent(LoginActivity.this, Home.class);
-            myIntent.putExtra("ITEM_ID", decryptedStr);
+            myIntent.putExtra("ITEM_ID", db.getSettings("BarCode"));
             startActivity(myIntent);
             finish();
         }
@@ -211,12 +163,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     }
 
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
     private void attemptLogin() {
         if (mAuthTask != null) {
             return;
@@ -244,53 +190,42 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
-        AsyncHttpClient client = new AsyncHttpClient();
         HashMap<String, String> param = new HashMap<String, String>();
-
         FirebaseMessaging.getInstance().subscribeToTopic("news");
+
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
         String deviceId = FirebaseInstanceId.getInstance().getId();
+
+        List<FirebaseApp> app = FirebaseApp.getApps(this);
+        FirebaseApp al = app.get(0);
+        FirebaseOptions aMz = al.getOptions();
+        String ve = aMz.getApiKey();
+
+        db = new MySQLiteHelper(this);
+        db.addSettings(new SettingsContent(1, "app", ve));
 
         param.put("name", email);
         param.put("phone", password);
         param.put("token", refreshedToken);
-        //    param.put("token", deviceId);
-        param.put("app", "AIzaSyB2zA4TL9napLFnR0cNI_I9gcdfg9qmZ6g");
+        param.put("app", ve);
 
         if (cancel) {
             focusView.requestFocus();
         } else {
-
             showProgress(true);
-            RequestParams params = new RequestParams(param);
-            client.post("https://simpletech-loyalty.herokuapp.com/api/contacts", params, new AsyncHttpResponseHandler() {
+            RequestToHeroku rth = new RequestToHeroku();
+            rth.HerokuPost(param, "contacts", new OnMyRequestListener() {
                 @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                public void onSuccess(JSONObject valueTrue) {
+
                     Toast.makeText(com.example.adamenko.loyalty.Activity.LoginActivity.this,
                             "Success", Toast.LENGTH_SHORT).show();
                     try {
-                        String value = new String(responseBody);
-                        JSONObject valueTrue = new JSONObject(value);
                         String barCode = new JSONObject(valueTrue.getString("contact")).getString("code");
-                        try {
-                            String code = new String(responseBody, "UTF-8");
+                        StringCrypter crypter = new StringCrypter();
+                        String encBase64Str = crypter.encrypt(barCode);
+                        db.addSettings(new SettingsContent(2, "BarCode", encBase64Str));
 
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                        }
-                        File tempFile = new File(getBaseContext().getCacheDir().getPath() + "/" + fileName);
-                        FileWriter writer = null;
-                        try {
-                            writer = new FileWriter(tempFile);
-                            StringCrypter crypter = new StringCrypter();
-                            String encBase64Str = crypter.encrypt(barCode);
-                            writer.write(encBase64Str);
-
-                            writer.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                  //      db.addSettings(new SettingsContent(1,"BarCode",barCode));
                         Intent myIntent = new Intent(LoginActivity.this, Home.class);
                         myIntent.putExtra("ITEM_ID", barCode);
                         startActivity(myIntent);
@@ -299,18 +234,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
                 }
 
                 @Override
-                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                    Toast.makeText(com.example.adamenko.loyalty.Activity.LoginActivity.this, "Error" + statusCode + "", Toast.LENGTH_SHORT).show();
-                    try {
-                        String value = new String(responseBody);
-                        String code = new String(responseBody, "UTF-8");
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
+                public void onFailure(String value) {
+
                 }
 
             });

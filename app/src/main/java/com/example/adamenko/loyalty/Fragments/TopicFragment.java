@@ -15,10 +15,11 @@ import android.view.ViewGroup;
 
 import com.example.adamenko.loyalty.Adapters.MyTopicRVA;
 import com.example.adamenko.loyalty.Content.TopicContent;
+import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.Decoration.DividerItemDecoration;
 import com.example.adamenko.loyalty.OnMyRequestListener;
 import com.example.adamenko.loyalty.R;
-import com.example.adamenko.loyalty.Request.RequestFroAll;
+import com.example.adamenko.loyalty.Request.RequestToHeroku;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,16 +31,14 @@ import java.util.List;
 
 
 public class TopicFragment extends Fragment {
-
     private static final String ARG_COLUMN_COUNT = "column-count";
     private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
-    OnMyRequestListener mRequestListener;
+    private OnListFragmentClickListener mListener;
     Context context;
     Activity ac;
     RecyclerView recyclerView;
     Drawable dividerDrawable;
-
+    private MySQLiteHelper db;
     public TopicFragment() {
     }
 
@@ -76,40 +75,43 @@ public class TopicFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
             dividerDrawable = ContextCompat.getDrawable(context, R.drawable.divider);
-            HashMap<String, String> param = new HashMap<String, String>();
-            param.put("app", "AIzaSyB2zA4TL9napLFnR0cNI_I9gcdfg9qmZ6g");
-            new RequestFroAll(param, "topics", new OnMyRequestListener() {
-                @Override
-                public void onSuccess(JSONObject valueTrue) {
-                    String title;
-                    String description;
-                    String id;
-
-                    JSONArray cast = null;
-                    List<TopicContent> items = new ArrayList<TopicContent>();
-                    try {
-                        cast = valueTrue.getJSONArray("topics");
-                        for (int i = 0; i < cast.length(); i++) {
-                            JSONObject actor = cast.getJSONObject(i);
-                            id = actor.getString("id");
-                            title = actor.getString("title");
-                            description = actor.getString("description");
-                            items.add(new TopicContent(Integer.parseInt(id), title, description, false));
+            HashMap<String, String> param = new HashMap<>();
+            RequestToHeroku rth = new RequestToHeroku();
+            db=new MySQLiteHelper(this.getContext());
+            String s=db.getSettings("app");
+            param.put("app", db.getSettings("app"));
+            if (db.getTopics().size()==0) {
+                rth.HerokuGet(param, "topics", new OnMyRequestListener() {
+                    @Override
+                    public void onSuccess(JSONObject valueTrue) {
+                        List<TopicContent> items = new ArrayList<>();
+                        try {
+                            JSONArray cast = valueTrue.getJSONArray("topics");
+                            for (int i = 0; i < cast.length(); i++) {
+                                JSONObject actor = cast.getJSONObject(i);
+                                TopicContent tc = new TopicContent(Integer.parseInt(actor.getString("id")), actor.getString("title"), actor.getString("description"), false);
+                                db.addTopics(tc);
+                                items.add(tc);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
+                        recyclerView.setAdapter(new MyTopicRVA(items, mListener,context));
+                        recyclerView.addItemDecoration(dividerItemDecoration);
                     }
 
-                    recyclerView.setAdapter(new MyTopicRVA(items, mListener));
-                    RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
-                    recyclerView.addItemDecoration(dividerItemDecoration);
-                }
+                    @Override
+                    public void onFailure(String value) {
 
-                @Override
-                public void onFailure(String value) {
-
-                }
-            });
+                    }
+                });
+            }
+            else {
+                RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
+                recyclerView.setAdapter(new MyTopicRVA(db.getTopics(), mListener,context));
+                recyclerView.addItemDecoration(dividerItemDecoration);
+            }
         }
         return view;
     }
@@ -119,8 +121,8 @@ public class TopicFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         ac = getActivity();
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
+        if (context instanceof OnListFragmentClickListener) {
+            mListener = (OnListFragmentClickListener) context;
 
         } else {
             throw new RuntimeException(context.toString()
@@ -134,8 +136,12 @@ public class TopicFragment extends Fragment {
         mListener = null;
     }
 
-    public interface OnListFragmentInteractionListener {
-        void onListFragmentInteraction(TopicContent item);
+    public interface OnListFragmentClickListener {
+        void onListFragmentClickListener(TopicContent item);
+    }
+
+    public interface OnListFragmentLongClickListener {
+        void onListFragmentLongClickListener(TopicContent item);
     }
 
 }

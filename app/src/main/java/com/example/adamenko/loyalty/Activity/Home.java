@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import com.example.adamenko.loyalty.Content.EventContent;
 import com.example.adamenko.loyalty.Content.TopicContent;
 import com.example.adamenko.loyalty.Crypter.StringCrypter;
+import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.Fragments.EventsFragment;
 import com.example.adamenko.loyalty.Fragments.HomeFragment;
 import com.example.adamenko.loyalty.Fragments.Subscribe;
@@ -26,12 +27,9 @@ import com.example.adamenko.loyalty.Fragments.TopicFragment;
 import com.example.adamenko.loyalty.R;
 import com.google.firebase.messaging.FirebaseMessaging;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-
 public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, TopicFragment.OnListFragmentInteractionListener, EventsFragment.OnListFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener,EventsFragment.OnListFragmentInteractionListener,TopicFragment.OnListFragmentClickListener,
+TopicFragment.OnListFragmentLongClickListener{
 
 
     private String fileName = R.string.file_name + "";
@@ -58,27 +56,14 @@ public class Home extends AppCompatActivity
         Intent intent = getIntent();
         String barcode_data = intent.getStringExtra("ITEM_ID");
 
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        MySQLiteHelper mlh=new MySQLiteHelper(this);
 
         if (barcode_data.equals("")) {
-            try {
-                File tempFile = new File(getBaseContext().getCacheDir().getPath() + "/" + fileName);
-                FileReader fReader = new FileReader(tempFile);
-                BufferedReader bReader = new BufferedReader(fReader);
-                while ((strLine = bReader.readLine()) != null) {
-                    barcode_data = crypter.decrypt(strLine).toString();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            barcode_data = crypter.decrypt(mlh.getSettings("BarCode"));
         }
-        if (barcode_data.equals("")) {
-            barcode_data = "1010101";
-        }
-     //   MySQLiteHelper db=new MySQLiteHelper(this);
-      //  barCode= db.getSettings("BarCode").getValue();
+
         barCode = barcode_data;
         Fragment fragment = null;
         Bundle bundle = new Bundle();
@@ -88,10 +73,9 @@ public class Home extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
-        bundle.putString("message", barCode);
-        if (bundle != null) {
-            fragment.setArguments(bundle);
-        }
+        bundle.putString("message", barcode_data);
+        assert fragment != null;
+        fragment.setArguments(bundle);
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
@@ -174,7 +158,17 @@ public class Home extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(final TopicContent item) {
+    public void onListFragmentClickListener(final TopicContent item) {
+
+    }
+
+    @Override
+    public void onListFragmentInteraction(EventContent item) {
+
+    }
+
+    @Override
+    public void onListFragmentLongClickListener(final TopicContent item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.subscribe_to_topic)
                 .setTitle("Topic");
@@ -192,11 +186,5 @@ public class Home extends AppCompatActivity
         });
         AlertDialog dialog = builder.create();
         dialog.show();
-
-    }
-
-    @Override
-    public void onListFragmentInteraction(EventContent item) {
-
     }
 }

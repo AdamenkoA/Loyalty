@@ -12,3 +12,4 @@
     tools:context="com.example.adamenko.loyalty.Fragments.TopicFragment"
     tools:listitem="@layout/fragment_topic">
 </android.support.v7.widget.RecyclerView>
+

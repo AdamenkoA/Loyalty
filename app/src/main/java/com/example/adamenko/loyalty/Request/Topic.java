@@ -3,7 +3,6 @@ package com.example.adamenko.loyalty.Request;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 
-import com.example.adamenko.loyalty.Adapters.MyTopicRVA;
 import com.example.adamenko.loyalty.Content.TopicContent;
 import com.example.adamenko.loyalty.Decoration.DividerItemDecoration;
 import com.example.adamenko.loyalty.Fragments.TopicFragment;
@@ -24,7 +23,7 @@ import cz.msebera.android.httpclient.Header;
 
 public class Topic {
 
-    public Topic(final RecyclerView recyclerView, final TopicFragment.OnListFragmentInteractionListener mListener, final Drawable dividerDrawable) {
+    public Topic(final RecyclerView recyclerView, final TopicFragment.OnListFragmentClickListener mListener, final Drawable dividerDrawable) {
         AsyncHttpClient client = new AsyncHttpClient();
         HashMap<String, String> param = new HashMap<String, String>();
         param.put("app", "AIzaSyB2zA4TL9napLFnR0cNI_I9gcdfg9qmZ6g");
@@ -52,7 +51,7 @@ public class Topic {
                     }
 
                     //   ListViewAdapter lviewAdapter = new ListViewAdapter(context,title,description);
-                    recyclerView.setAdapter(new MyTopicRVA(items, mListener));
+                   // recyclerView.setAdapter(new MyTopicRVA(items, mListener));
                     RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
                     recyclerView.addItemDecoration(dividerItemDecoration);
 

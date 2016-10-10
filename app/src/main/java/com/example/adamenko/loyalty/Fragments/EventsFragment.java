@@ -14,10 +14,11 @@ import android.view.ViewGroup;
 
 import com.example.adamenko.loyalty.Adapters.MyEventsRVA;
 import com.example.adamenko.loyalty.Content.EventContent;
+import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.Decoration.DividerItemDecoration;
 import com.example.adamenko.loyalty.OnMyRequestListener;
 import com.example.adamenko.loyalty.R;
-import com.example.adamenko.loyalty.Request.RequestFroAll;
+import com.example.adamenko.loyalty.Request.RequestToHeroku;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,6 +45,7 @@ public class EventsFragment extends Fragment {
     Drawable dividerDrawable;
     RecyclerView recyclerView;
     private OnListFragmentInteractionListener mListener;
+    private MySQLiteHelper db;
 
     public EventsFragment() {
     }
@@ -71,7 +73,6 @@ public class EventsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_list, container, false);
 
-        // Set the adapter
         if (view instanceof RecyclerView) {
             Context context = view.getContext();
             recyclerView = (RecyclerView) view;
@@ -82,42 +83,22 @@ public class EventsFragment extends Fragment {
             }
             dividerDrawable = ContextCompat.getDrawable(context, R.drawable.divider);
             HashMap<String, String> param = new HashMap<String, String>();
-            param.put("app", "AIzaSyB2zA4TL9napLFnR0cNI_I9gcdfg9qmZ6g");
-            new RequestFroAll(param, "events", new OnMyRequestListener() {
+            RequestToHeroku rth = new RequestToHeroku();
+            param.put("app", db.getSettings("app"));
+            rth.HerokuGet(param, "events", new OnMyRequestListener() {
                 @Override
                 public void onSuccess(JSONObject valueTrue) {
-                    String id;
-                    String topicId;
-                    String date;
-                    String time;
-                    String title;
-                    Date dateF = new Date();
-                    String description;
-                    List<EventContent> items = new ArrayList<EventContent>();
+                    List<EventContent> items = new ArrayList<>();
 
-                    JSONArray cast = null;
                     try {
-                        cast = valueTrue.getJSONArray("events");
+                        JSONArray cast = valueTrue.getJSONArray("events");
                         for (int i = 0; i < cast.length(); i++) {
                             JSONObject actor = cast.getJSONObject(i);
-                            id = actor.getString("id");
-                            topicId = actor.getString("topic_id");
-                            title = actor.getString("title");
+                            EventContent ec = new EventContent(actor.getString("id"), actor.getString("topic_id"),
+                                    DateFormater(actor.getString("date")), actor.getString("time"), actor.getString("title"), actor.getString("description"));
+                            db.addEvents(ec);
+                            items.add(ec);
 
-                            DateFormat df = new SimpleDateFormat("dd.MM");
-                            String string = "January 2, 2010";
-                            DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-
-                            try {
-                                dateF = format.parse(actor.getString("date"));
-
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                            }
-                            date = df.format(dateF) + "";
-                            time = actor.getString("time");
-                            description = actor.getString("description");
-                            items.add(new EventContent(id, topicId, date, time, title, description));
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -156,5 +137,20 @@ public class EventsFragment extends Fragment {
 
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(EventContent item);
+    }
+
+    private String DateFormater(String date) {
+        Date dateE = new Date();
+        DateFormat df = new SimpleDateFormat("dd.MM");
+        String string = "January 2, 2010";
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        try {
+            dateE = format.parse(date);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return df.format(dateE) + "";
     }
 }

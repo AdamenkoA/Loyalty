@@ -39,6 +39,7 @@ public class TopicFragment extends Fragment {
     RecyclerView recyclerView;
     Drawable dividerDrawable;
     private MySQLiteHelper db;
+
     public TopicFragment() {
     }
 
@@ -77,10 +78,9 @@ public class TopicFragment extends Fragment {
             dividerDrawable = ContextCompat.getDrawable(context, R.drawable.divider);
             HashMap<String, String> param = new HashMap<>();
             RequestToHeroku rth = new RequestToHeroku();
-            db=new MySQLiteHelper(this.getContext());
-            String s=db.getSettings("app");
+            db = new MySQLiteHelper(this.getContext());
             param.put("app", db.getSettings("app"));
-            if (db.getTopics().size()==0) {
+            if (db.getTopics().size() == 0) {
                 rth.HerokuGet(param, "topics", new OnMyRequestListener() {
                     @Override
                     public void onSuccess(JSONObject valueTrue) {
@@ -97,7 +97,7 @@ public class TopicFragment extends Fragment {
                             e.printStackTrace();
                         }
                         RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
-                        recyclerView.setAdapter(new MyTopicRVA(items, mListener,context));
+                        recyclerView.setAdapter(new MyTopicRVA(items, mListener, context));
                         recyclerView.addItemDecoration(dividerItemDecoration);
                     }
 
@@ -106,10 +106,9 @@ public class TopicFragment extends Fragment {
 
                     }
                 });
-            }
-            else {
+            } else {
                 RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
-                recyclerView.setAdapter(new MyTopicRVA(db.getTopics(), mListener,context));
+                recyclerView.setAdapter(new MyTopicRVA(db.getTopics(), mListener, context));
                 recyclerView.addItemDecoration(dividerItemDecoration);
             }
         }
@@ -138,10 +137,12 @@ public class TopicFragment extends Fragment {
 
     public interface OnListFragmentClickListener {
         void onListFragmentClickListener(TopicContent item);
+
+        void onListFragmentLongClickListener(TopicContent item, Boolean holder, OnDialogClick mClickListener);
     }
 
-    public interface OnListFragmentLongClickListener {
-        void onListFragmentLongClickListener(TopicContent item);
+    public interface OnDialogClick {
+        void onDialogClick(Boolean mFlag);
     }
 
 }

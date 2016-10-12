@@ -21,13 +21,13 @@ public class MyTopicRVA extends RecyclerView.Adapter<MyTopicRVA.ViewHolder> {
 
     private final List<TopicContent> mValues;
     private final TopicFragment.OnListFragmentClickListener mListener;
+
     private final Context mContext;
 
     public MyTopicRVA(List<TopicContent> items, TopicFragment.OnListFragmentClickListener listener, Context context) {
         mValues = items;
         mListener = listener;
-        mContext=context;
-
+        mContext = context;
     }
 
 
@@ -52,7 +52,7 @@ public class MyTopicRVA extends RecyclerView.Adapter<MyTopicRVA.ViewHolder> {
             @Override
             public void onClick(View v) {
                 if (null != mListener) {
-                    if (!holder.mOpen) {
+                    if (!holder.mFlag) {
                         params.height = mContext.getResources().getDimensionPixelSize(R.dimen.text_view_height);
                         holder.mContentView.setLayoutParams(params);
                         holder.mContentView.setVisibility(View.VISIBLE);
@@ -61,10 +61,9 @@ public class MyTopicRVA extends RecyclerView.Adapter<MyTopicRVA.ViewHolder> {
                         rotate.setDuration(300);
                         rotate.setFillAfter(true);
                         holder.mArrow.setAnimation(rotate);
-                        holder.mOpen=true;
+                        holder.mFlag = true;
                         mListener.onListFragmentClickListener(holder.mItem);
-                    }
-                    else {
+                    } else {
                         params.height = 0;
                         holder.mContentView.setLayoutParams(params);
                         holder.mContentView.setVisibility(View.INVISIBLE);
@@ -72,7 +71,7 @@ public class MyTopicRVA extends RecyclerView.Adapter<MyTopicRVA.ViewHolder> {
                                 new RotateAnimation(360, 360, RELATIVE_TO_SELF, 0.5f, RELATIVE_TO_SELF, 0.5f);
                         rotate.setDuration(300);
                         rotate.setFillAfter(true);
-                        holder.mOpen=false;
+                        holder.mFlag = false;
                         holder.mArrow.setAnimation(rotate);
                     }
                 }
@@ -82,9 +81,19 @@ public class MyTopicRVA extends RecyclerView.Adapter<MyTopicRVA.ViewHolder> {
             @Override
             public boolean onLongClick(View view) {
                 if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentClickListener(holder.mItem);
+                    holder.mFlagL = !holder.mFlagL;
+                    mListener.onListFragmentLongClickListener(holder.mItem, holder.mFlagL, new TopicFragment.OnDialogClick() {
+                        @Override
+                        public void onDialogClick(Boolean mFlag) {
+                            if (mFlag) {
+                                holder.mContentView.setTextColor(mContext.getColor(R.color.red));
+                                holder.mIdView.setTextColor(mContext.getColor(R.color.red));
+                            } else {
+                                holder.mContentView.setTextColor(mContext.getColor(R.color.black));
+                                holder.mIdView.setTextColor(mContext.getColor(R.color.black));
+                            }
+                        }
+                    });
                 }
                 return false;
             }
@@ -96,29 +105,28 @@ public class MyTopicRVA extends RecyclerView.Adapter<MyTopicRVA.ViewHolder> {
         return mValues.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public TopicContent mItem;
-        public ImageView mArrow;
-        public Boolean mOpen;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final View mView;
+        final TextView mIdView;
+        final TextView mContentView;
+        TopicContent mItem;
+        ImageView mArrow;
+        Boolean mFlag;
+        Boolean mFlagL;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             mView = view;
             mIdView = (TextView) view.findViewById(R.id.id_topic);
             mContentView = (TextView) view.findViewById(R.id.content_topic);
-            mArrow=(ImageView) view.findViewById(R.id.ic_arrow_down);
-            mOpen=false;
+            mArrow = (ImageView) view.findViewById(R.id.ic_arrow_down);
+            mFlag = false;
+            mFlagL = false;
         }
-
 
         @Override
         public String toString() {
             return super.toString() + " '" + mContentView.getText() + "'";
         }
     }
-//    https://github.com/thoughtbot/expandable-recycler-view/blob/a7631a2707a16c21856a25fdea390408d71c53d8/sample/src/main/java/com/thoughtbot/expandablerecyclerview/sample/expand/GenreViewHolder.java
-
 }

@@ -84,6 +84,7 @@ public class EventsFragment extends Fragment {
             dividerDrawable = ContextCompat.getDrawable(context, R.drawable.divider);
             HashMap<String, String> param = new HashMap<String, String>();
             RequestToHeroku rth = new RequestToHeroku();
+            db = new MySQLiteHelper(this.getContext());
             param.put("app", db.getSettings("app"));
             rth.HerokuGet(param, "events", new OnMyRequestListener() {
                 @Override

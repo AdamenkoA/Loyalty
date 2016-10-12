@@ -1,6 +1,7 @@
 package com.example.adamenko.loyalty.Activity;
 
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,22 +23,16 @@ import com.example.adamenko.loyalty.Crypter.StringCrypter;
 import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.Fragments.EventsFragment;
 import com.example.adamenko.loyalty.Fragments.HomeFragment;
-import com.example.adamenko.loyalty.Fragments.Subscribe;
 import com.example.adamenko.loyalty.Fragments.TopicFragment;
 import com.example.adamenko.loyalty.R;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,EventsFragment.OnListFragmentInteractionListener,TopicFragment.OnListFragmentClickListener,
-TopicFragment.OnListFragmentLongClickListener{
-
-
-    private String fileName = R.string.file_name + "";
+        implements NavigationView.OnNavigationItemSelectedListener, EventsFragment.OnListFragmentInteractionListener, TopicFragment.OnListFragmentClickListener {
     private String barCode = "";
-    private String strLine = "";
-    private ActionBarDrawerToggle mActionBarDrawerToggle;
     private StringCrypter crypter;
-
+    private MySQLiteHelper db;
+    Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +53,7 @@ TopicFragment.OnListFragmentLongClickListener{
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        MySQLiteHelper mlh=new MySQLiteHelper(this);
+        MySQLiteHelper mlh = new MySQLiteHelper(this);
 
         if (barcode_data.equals("")) {
             barcode_data = crypter.decrypt(mlh.getSettings("BarCode"));
@@ -67,7 +62,7 @@ TopicFragment.OnListFragmentLongClickListener{
         barCode = barcode_data;
         Fragment fragment = null;
         Bundle bundle = new Bundle();
-
+        mContext=this;
         try {
             fragment = HomeFragment.class.newInstance();
         } catch (Exception e) {
@@ -141,9 +136,8 @@ TopicFragment.OnListFragmentLongClickListener{
             e.printStackTrace();
         }
         bundle.putString("message", barCode);
-        if (bundle != null) {
-            fragment.setArguments(bundle);
-        }
+        assert fragment != null;
+        fragment.setArguments(bundle);
 
         setTitle(item.getTitle());
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -168,20 +162,27 @@ TopicFragment.OnListFragmentLongClickListener{
     }
 
     @Override
-    public void onListFragmentLongClickListener(final TopicContent item) {
+    public void onListFragmentLongClickListener(final TopicContent item, final Boolean mFlag, final TopicFragment.OnDialogClick mClickListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.subscribe_to_topic)
+        String question = "";
+
+        question = mFlag ? getResources().getString(R.string.subscribe_to_topic) : getResources().getString(R.string.unsubscribe_to_topic_to_topic);
+        builder.setMessage(question)
                 .setTitle("Topic");
 
         builder.setPositiveButton(R.string.subscribe_yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 FirebaseMessaging.getInstance().subscribeToTopic("topic_" + item.getId());
-                new Subscribe(barCode, item.getId()+"");
+                mClickListener.onDialogClick(true);
+                MySQLiteHelper db=new MySQLiteHelper(mContext);
+                db.updateTopics(item);
+                //    new Subscribe(barCode, item.getId() + "");
             }
         });
         builder.setNegativeButton(R.string.subscribe_no, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User cancelled the dialog
+                mClickListener.onDialogClick(false);
             }
         });
         AlertDialog dialog = builder.create();

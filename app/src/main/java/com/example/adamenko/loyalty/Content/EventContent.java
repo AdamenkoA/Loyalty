@@ -60,18 +60,29 @@ public class EventContent {
     private String title;
     private String description;
 
-    public EventContent() {
+    public String getColor() {
+        return color;
     }
 
-    public EventContent(String id, String topicId, String date, String time, String title, String description) {
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    private String color;
+
+    public EventContent(String id, String topicId, String date, String time, String title, String description, String color) {
         this.id = id;
         this.topicId = topicId;
         this.date = date;
         this.time = time;
-
         this.title = title;
         this.description = description;
+        this.color = color;
     }
+
+    public EventContent() {
+    }
+
 
     @Override
     public String toString() {

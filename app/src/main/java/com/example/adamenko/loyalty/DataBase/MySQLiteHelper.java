@@ -29,6 +29,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     private static final String KEY_SUBSCRIBE = "subscribe";
     private static final String KEY_DATE = "date";
     private static final String KEY_TIME = "time";
+    private static final String KEY_COLOR = "color";
     private String CREATE_TABLE_SETTINGS = "";
     private String CREATE_TABLE_EVENTS = "";
     private String CREATE_TABLE_TOPICS = "";
@@ -76,6 +77,41 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void updateSettings(SettingsContent settingsContent) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_VALUE, settingsContent.getValue());
+        values.put(KEY_KEY, settingsContent.getKey());
+        int i = db.update(TABLE_SETTINGS,
+                values,
+                KEY_ID + " = ?",
+                new String[]{String.valueOf(settingsContent.getId())});
+        db.close();
+    }
+
+    public String getSettings(String key) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String sc = "";
+        Cursor cursor =
+                db.query(TABLE_SETTINGS,
+                        new String[]{KEY_VALUE},
+                        "key = " + "\'" + String.valueOf(key) + "\'",
+                        null, null, null, null, null);
+        if ((cursor != null ? cursor.getCount() : 0) != 0) {
+            cursor.moveToFirst();
+            sc = cursor.getString(0);
+        }
+        return sc;
+    }
+
+    public void deleteSettings(SettingsContent settingsContent) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_SETTINGS,
+                KEY_ID + " = ?",
+                new String[]{String.valueOf(settingsContent.getId())});
+        db.close();
+    }
+
     public void addTopics(TopicContent topic) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -83,47 +119,33 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_TITLE, topic.getTitle());
         values.put(KEY_DESCRIPTION, topic.getDescription());
         values.put(KEY_SUBSCRIBE, topic.getSubscribe());
-        db.insert(TABLE_TOPICS, // table
-                null, //nullColumnHack
-                values); // key/value -> keys = column names/ values = column values
+        values.put(KEY_COLOR, topic.getColor());
+        if (getId(TABLE_TOPICS, topic.getId() + "", db)) {
+            db.insert(TABLE_TOPICS,
+                    null,
+                    values);
+        } else
+            db.update(TABLE_TOPICS,
+                    values,
+                    KEY_ID + " = ?",
+                    new String[]{topic.getId() + ""});
         db.close();
     }
 
-    public void addEvents(EventContent event) {
+    public int updateTopics(TopicContent topic) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_ID, event.getId());
-        values.put(KEY_DESCRIPTION, event.getDescription());
-        values.put(KEY_TITLE, event.getTitle());
-        values.put(KEY_DATE, event.getDate());
-        values.put(KEY_TIME, event.getTitle());
-        values.put(KEY_TOPIC_ID, event.getTopicId());
-        db.insert(TABLE_EVENTS, // table
-                null, //nullColumnHack
-                values); // key/value -> keys = column names/ values = column values
+        values.put(KEY_ID, topic.getId());
+        values.put(KEY_TITLE, topic.getTitle());
+        values.put(KEY_DESCRIPTION, topic.getDescription());
+        values.put(KEY_SUBSCRIBE, topic.getSubscribe());
+        values.put(KEY_COLOR, topic.getSubscribe());
+        int i = db.update(TABLE_TOPICS,
+                values,
+                KEY_ID + " = ?",
+                new String[]{String.valueOf(topic.getId())});
         db.close();
-    }
-
-    public String getSettings(String key) {
-        // 1. get reference to readable DB
-        SQLiteDatabase db = this.getReadableDatabase();
-        String sc = "";
-        // 2. build query
-        Cursor cursor =
-                db.query(TABLE_SETTINGS, // a. table
-                        new String[]{KEY_VALUE}, // b. column names
-                        "key = " + "\'" + String.valueOf(key) + "\'", // c. selections
-                        null, // d. selections args
-                        null, // e. group by
-                        null, // f. having
-                        null, // g. order by
-                        null); // h. limit
-        if (cursor != null)
-            cursor.moveToFirst();
-        if (cursor.getCount() != 0) {
-            sc = cursor.getString(0);
-        }
-        return sc;
+        return i;
     }
 
     public List<TopicContent> getTopics() {
@@ -140,15 +162,85 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
                         null, // f. having
                         null, // g. order by
                         null); // h. limit
-        if (cursor != null)
-            cursor.moveToFirst();
-        if (cursor.getCount() != 0) {
-            for (int i = 0; i < cursor.getCount(); i++) {
-                topics.add(new TopicContent(Integer.parseInt(cursor.getString(0)), cursor.getString(1), cursor.getString(2), false));
-            }
 
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                String id = cursor.getString(cursor.getColumnIndex(KEY_ID));
+                String title = cursor.getString(cursor.getColumnIndex(KEY_TITLE));
+                String description = cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION));
+                Boolean subscribe = cursor.getInt(cursor.getColumnIndex(KEY_SUBSCRIBE)) > 0;
+                String color = cursor.getString(cursor.getColumnIndex(KEY_COLOR));
+
+                topics.add(new TopicContent(Integer.parseInt(id), title, description, subscribe, color));
+                cursor.moveToNext();
+            }
         }
+
         return topics;
+    }
+
+    public TopicContent getTopic(String topicId) {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        String id = "";
+        String title = "";
+        String description = "";
+        Boolean subscribe = false;
+        String color = "";
+        Cursor cursor =
+                db.query(TABLE_TOPICS, // a. table
+                        new String[]{"*"}, // c. selections
+                        KEY_ID + "= ?", // b. column names
+                        new String[]{topicId + ""}, // d. selections args
+                        null, // e. group by
+                        null, // f. having
+                        null, // g. order by
+                        null); // h. limit
+
+        if (cursor.moveToFirst()) {
+            id = cursor.getString(cursor.getColumnIndex(KEY_ID));
+            title = cursor.getString(cursor.getColumnIndex(KEY_TITLE));
+            description = cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION));
+            subscribe = cursor.getInt(cursor.getColumnIndex(KEY_SUBSCRIBE)) > 0;
+            color = cursor.getString(cursor.getColumnIndex(KEY_COLOR));
+        }
+        return new TopicContent(Integer.parseInt(id), title, description, subscribe, color);
+    }
+
+    public void deleteTopic(TopicContent topic) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_TOPICS, //table name
+                KEY_ID + " = ?",  // selections
+                new String[]{String.valueOf(topic.getId())}); //selections args
+        // 3. close
+        db.close();
+    }
+
+    public void deleteAllTopic() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_TOPICS, null, null);
+        db.close();
+    }
+
+    public void addEvents(EventContent event) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_ID, event.getId());
+        values.put(KEY_DESCRIPTION, event.getDescription());
+        values.put(KEY_TITLE, event.getTitle());
+        values.put(KEY_DATE, event.getDate());
+        values.put(KEY_TIME, event.getTime());
+        values.put(KEY_TOPIC_ID, event.getTopicId());
+        if (getId(TABLE_EVENTS, event.getId(), db)) {
+            db.insert(TABLE_EVENTS,
+                    null,
+                    values);
+        } else
+            db.update(TABLE_EVENTS,
+                    values,
+                    KEY_ID + " = ?",
+                    new String[]{String.valueOf(event.getId())});
+        db.close();
     }
 
     public List<EventContent> getEvents() {
@@ -157,54 +249,32 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         List<EventContent> event = new ArrayList<>();
         // 2. build query
         Cursor cursor =
-                db.query(TABLE_EVENTS, // a. table
-                        new String[]{"*"}, // b. column names
-                        null, // c. selections
-                        null, // d. selections args
-                        null, // e. group by
-                        null, // f. having
-                        null, // g. order by
-                        null); // h. limit
-        if (cursor != null)
-            cursor.moveToFirst();
-        if (cursor.getCount() != 0) {
-            for (int i = 0; i < cursor.getCount(); i++) {
-                event.add(new EventContent(cursor.getString(0), cursor.getString(1),
-                        cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5)));
+                db.query(TABLE_EVENTS,
+                        new String[]{"*"},
+                        null, null, null, null, null, null);
 
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                String id = cursor.getString(cursor.getColumnIndex(KEY_ID));
+                String title = cursor.getString(cursor.getColumnIndex(KEY_TITLE));
+                String descrpition = cursor.getString(cursor.getColumnIndex(KEY_DESCRIPTION));
+                String date = cursor.getString(cursor.getColumnIndex(KEY_DATE));
+                String time = cursor.getString(cursor.getColumnIndex(KEY_TIME));
+                String topic_id = cursor.getString(cursor.getColumnIndex(KEY_TOPIC_ID));
+                String color = cursor.getString(cursor.getColumnIndex(KEY_COLOR));
+                if (color==null){
+                    color=getTopic(topic_id).getColor();
+                }
+                event.add(new EventContent(id, topic_id, date, time, title, descrpition, color));
+                cursor.moveToNext();
             }
-
         }
+
         return event;
     }
 
-    public int updateSettings(SettingsContent settingsContent) {
-
-        // 1. get reference to writable DB
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        // 2. create ContentValues to add key "column"/value
-        ContentValues values = new ContentValues();
-        values.put(KEY_VALUE, settingsContent.getValue()); // get title
-        values.put(KEY_KEY, settingsContent.getKey()); // get author
-
-        // 3. updating row
-        int i = db.update(TABLE_SETTINGS, //table
-                values, // column/value
-                KEY_ID + " = ?", // selections
-                new String[]{String.valueOf(settingsContent.getId())}); //selection args
-
-        // 4. close
-        db.close();
-        return i;
-    }
-
     public int updateEvents(EventContent event) {
-
-        // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
-
-        // 2. create ContentValues to add key "column"/value
         ContentValues values = new ContentValues();
         values.put(KEY_ID, event.getId());
         values.put(KEY_DESCRIPTION, event.getDescription());
@@ -212,79 +282,50 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
         values.put(KEY_DATE, event.getDate());
         values.put(KEY_TIME, event.getTitle());
         values.put(KEY_TOPIC_ID, event.getTopicId());
-
-        // 3. updating row
-        int i = db.update(TABLE_EVENTS, //table
-                values, // column/value
-                KEY_ID + " = ?", // selections
-                new String[]{String.valueOf(event.getId())}); //selection args
-
-        // 4. close
+        int i = db.update(TABLE_EVENTS,
+                values,
+                KEY_ID + " = ?",
+                new String[]{String.valueOf(event.getId())});
         db.close();
         return i;
-    }
-
-    public int updateTopics(TopicContent topic) {
-
-        // 1. get reference to writable DB
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        // 2. create ContentValues to add key "column"/value
-        ContentValues values = new ContentValues();
-
-        values.put(KEY_ID, topic.getId());
-        values.put(KEY_TITLE, topic.getTitle());
-        values.put(KEY_DESCRIPTION, topic.getDescription());
-        values.put(KEY_SUBSCRIBE, topic.getSubscribe());
-
-        // 3. updating row
-        int i = db.update(TABLE_SETTINGS, //table
-                values, // column/value
-                KEY_ID + " = ?", // selections
-                new String[]{String.valueOf(topic.getId())}); //selection args
-
-        // 4. close
-        db.close();
-        return i;
-    }
-
-    public void deleteSettings(SettingsContent settingsContent) {
-
-        // 1. get reference to writable DB
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        // 2. delete
-        db.delete(TABLE_SETTINGS, //table name
-                KEY_ID + " = ?",  // selections
-                new String[]{String.valueOf(settingsContent.getId())}); //selections args
-
-        // 3. close
-        db.close();
-
     }
 
     public void deleteEvents(EventContent event) {
-        // 1. get reference to writable DB
         SQLiteDatabase db = this.getWritableDatabase();
-
-        // 2. delete
-        db.delete(TABLE_EVENTS, //table name
-                KEY_ID + " = ?",  // selections
-                new String[]{String.valueOf(event.getId())}); //selections args
-        // 3. close
+        db.delete(TABLE_EVENTS,
+                KEY_ID + " = ?",
+                new String[]{String.valueOf(event.getId())});
         db.close();
     }
 
-    public void deleteTopic(TopicContent topic) {
-        // 1. get reference to writable DB
+    public void deleteAllEvents() {
         SQLiteDatabase db = this.getWritableDatabase();
-
-        // 2. delete
-        db.delete(TABLE_TOPICS, //table name
-                KEY_ID + " = ?",  // selections
-                new String[]{String.valueOf(topic.getId())}); //selections args
-        // 3. close
+        db.delete(TABLE_EVENTS, null, null);
         db.close();
+    }
+
+    private boolean getId(String table, String id, SQLiteDatabase db) {
+        Cursor cursor =
+                db.query(table,
+                        new String[]{KEY_ID},
+                        KEY_ID + "= ?",
+                        new String[]{id}, null, null, null, null);
+        return cursor.getCount() <= 0;
+    }
+
+    public boolean getSubscribe(Integer id, SQLiteDatabase db) {
+        Boolean result = false;
+        Cursor cursor =
+                db.query(TABLE_TOPICS,
+                        new String[]{KEY_SUBSCRIBE},
+                        KEY_ID + "= ?",
+                        new String[]{id + ""}, null, null, null, null);
+        if (cursor != null)
+            cursor.moveToFirst();
+        if (cursor.getCount() != 0) {
+            result = cursor.getInt(cursor.getColumnIndex(KEY_SUBSCRIBE)) > 0;
+        }
+        return result;
     }
 
 }

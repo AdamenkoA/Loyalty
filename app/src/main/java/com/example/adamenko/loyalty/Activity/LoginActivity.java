@@ -32,8 +32,6 @@ import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.OnMyRequestListener;
 import com.example.adamenko.loyalty.R;
 import com.example.adamenko.loyalty.Request.RequestToHeroku;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -155,7 +153,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         } else {
 
             Intent myIntent = new Intent(LoginActivity.this, Home.class);
-            myIntent.putExtra("ITEM_ID", db.getSettings("BarCode"));
+            StringCrypter crypter = new StringCrypter();
+            myIntent.putExtra("ITEM_ID",crypter.decrypt(db.getSettings("BarCode")));
             startActivity(myIntent);
             finish();
         }
@@ -194,20 +193,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         FirebaseMessaging.getInstance().subscribeToTopic("news");
 
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        String deviceId = FirebaseInstanceId.getInstance().getId();
 
-        List<FirebaseApp> app = FirebaseApp.getApps(this);
-        FirebaseApp al = app.get(0);
-        FirebaseOptions aMz = al.getOptions();
-        String ve = aMz.getApiKey();
+        String app = getString(R.string.app);
 
         db = new MySQLiteHelper(this);
-        db.addSettings(new SettingsContent(1, "app", ve));
+
+        db.addSettings(new SettingsContent(1, "app",app));
 
         param.put("name", email);
         param.put("phone", password);
         param.put("token", refreshedToken);
-        param.put("app", ve);
+        param.put("app", app);
 
         if (cancel) {
             focusView.requestFocus();
@@ -238,7 +234,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                 @Override
                 public void onFailure(String value) {
-
+                    Toast.makeText(com.example.adamenko.loyalty.Activity.LoginActivity.this,
+                            value, Toast.LENGTH_SHORT).show();
                 }
 
             });

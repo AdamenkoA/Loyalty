@@ -32,22 +32,16 @@ public class TopicContent {
         this.description = description;
     }
 
-    private Integer id;
-
     public TopicContent() {
     }
 
-    private String title;
-    private String description;
-
-    public TopicContent(Integer id, String title, String description, Boolean subscribe) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.subscribe = subscribe;
+    public String getColor() {
+        return color;
     }
 
-    private Boolean subscribe;
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     public Boolean getSubscribe() {
         return subscribe;
@@ -55,6 +49,20 @@ public class TopicContent {
 
     public void setSubscribe(Boolean subscribe) {
         this.subscribe = subscribe;
+    }
+
+    private Integer id;
+    private String title;
+    private String description;
+    private Boolean subscribe;
+    private String color;
+
+    public TopicContent(Integer id, String title, String description, Boolean subscribe, String color) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.subscribe = subscribe;
+        this.color = color;
     }
 
     @Override

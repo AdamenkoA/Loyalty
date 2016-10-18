@@ -1,6 +1,7 @@
 package com.example.adamenko.loyalty.Adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,7 +44,10 @@ public class MyTopicRVA extends RecyclerView.Adapter<MyTopicRVA.ViewHolder> {
         holder.mItem = mValues.get(position);
         holder.mIdView.setText(mValues.get(position).getTitle());
         holder.mContentView.setText(mValues.get(position).getDescription());
-
+        if (holder.mItem.getSubscribe()&& !holder.mItem.getColor().equals("")) {
+            holder.mContentView.setTextColor(Color.parseColor(holder.mItem.getColor()));
+            holder.mIdView.setTextColor(Color.parseColor(holder.mItem.getColor()));
+        }
         final ViewGroup.LayoutParams params = holder.mContentView.getLayoutParams();
         params.height = 0;
         holder.mContentView.setLayoutParams(params);
@@ -84,13 +88,10 @@ public class MyTopicRVA extends RecyclerView.Adapter<MyTopicRVA.ViewHolder> {
                     holder.mFlagL = !holder.mFlagL;
                     mListener.onListFragmentLongClickListener(holder.mItem, holder.mFlagL, new TopicFragment.OnDialogClick() {
                         @Override
-                        public void onDialogClick(Boolean mFlag) {
-                            if (mFlag) {
-                                holder.mContentView.setTextColor(mContext.getColor(R.color.red));
-                                holder.mIdView.setTextColor(mContext.getColor(R.color.red));
-                            } else {
-                                holder.mContentView.setTextColor(mContext.getColor(R.color.black));
-                                holder.mIdView.setTextColor(mContext.getColor(R.color.black));
+                        public void onDialogClick(Boolean mFlag, Context nContext, String mColor) {
+                            if (!holder.mItem.getColor().equals("")) {
+                                holder.mContentView.setTextColor(Color.parseColor(mColor));
+                                holder.mIdView.setTextColor(Color.parseColor(mColor));
                             }
                         }
                     });

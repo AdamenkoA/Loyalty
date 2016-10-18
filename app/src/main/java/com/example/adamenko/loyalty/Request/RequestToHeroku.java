@@ -10,7 +10,6 @@ import com.loopj.android.http.RequestParams;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import cz.msebera.android.httpclient.Header;
@@ -25,41 +24,11 @@ public class RequestToHeroku {
 
     }
 
-    public void HerokuGet(HashMap<String, String> param, String page, final OnMyRequestListener  mRequestListener) {
+    public void HerokuGet(HashMap<String, String> param, String page, final OnMyRequestListener mRequestListener) {
 
         AsyncHttpClient client = new AsyncHttpClient();
         RequestParams params = new RequestParams(param);
-        client.get("https://simpletech-loyalty.herokuapp.com/api/"+page, params, new AsyncHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                try {
-                    String value = new String(responseBody);
-                    JSONObject valueTrue = new JSONObject(value);
-                        mRequestListener.onSuccess(valueTrue);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                try {
-                    String value = new String(responseBody);
-                    Log.e("Request",value);
-                    String code = new String(responseBody, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        });
-
-    }
-    public void HerokuPost(HashMap<String, String> param, String page, final OnMyRequestListener  mRequestListener) {
-
-        AsyncHttpClient client = new AsyncHttpClient();
-        RequestParams params = new RequestParams(param);
-        client.post("https://simpletech-loyalty.herokuapp.com/api/"+page, params, new AsyncHttpResponseHandler() {
+        client.get("https://simpletech-loyalty.herokuapp.com/api/" + page, params, new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
@@ -73,12 +42,42 @@ public class RequestToHeroku {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                String value = "Нет соединения с интернетом";
+                if (responseBody != null) {
+                    value = new String(responseBody);
+                } else
+                    mRequestListener.onFailure(value);
+                Log.e("Request", value);
+            }
+
+        });
+
+    }
+
+    public void HerokuPost(HashMap<String, String> param, String page, final OnMyRequestListener mRequestListener) {
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams(param);
+        client.post("https://simpletech-loyalty.herokuapp.com/api/" + page, params, new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
                 try {
                     String value = new String(responseBody);
-                    String code = new String(responseBody, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
+                    JSONObject valueTrue = new JSONObject(value);
+                    mRequestListener.onSuccess(valueTrue);
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                String value = "Нет соединения с интернетом";
+                if (responseBody != null) {
+                    value = new String(responseBody);
+                } else
+                    mRequestListener.onFailure(value);
+                Log.e("Request", value);
             }
 
         });

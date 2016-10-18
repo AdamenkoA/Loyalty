@@ -3,13 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.example.adamenko.loyalty.Fragments.HomeFragment">
+    tools:context="com.example.adamenko.loyalty.Fragments.HomeFragment"
+    android:background="@android:color/white">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:srcCompat="@drawable/bar_code"
-        android:layout_gravity="bottom|end"
-        android:id="@+id/bar_code_view" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            app:srcCompat="@drawable/logo"
+            android:layout_gravity="top|start"
+            android:id="@+id/log_view" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:srcCompat="@drawable/bar_code"
+            android:layout_gravity="bottom|end"
+            android:id="@+id/bar_code_view"
+            app:layout_constraintTop_toBottomOf="@+id/log_view" />
+
+
 
 </FrameLayout>

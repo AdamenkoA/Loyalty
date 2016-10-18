@@ -4,6 +4,8 @@ package com.example.adamenko.loyalty.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -24,8 +26,14 @@ import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.Fragments.EventsFragment;
 import com.example.adamenko.loyalty.Fragments.HomeFragment;
 import com.example.adamenko.loyalty.Fragments.TopicFragment;
+import com.example.adamenko.loyalty.OnMyRequestListener;
 import com.example.adamenko.loyalty.R;
+import com.example.adamenko.loyalty.Request.RequestToHeroku;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
 
 public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, EventsFragment.OnListFragmentInteractionListener, TopicFragment.OnListFragmentClickListener {
@@ -62,7 +70,7 @@ public class Home extends AppCompatActivity
         barCode = barcode_data;
         Fragment fragment = null;
         Bundle bundle = new Bundle();
-        mContext=this;
+        mContext = this;
         try {
             fragment = HomeFragment.class.newInstance();
         } catch (Exception e) {
@@ -165,27 +173,63 @@ public class Home extends AppCompatActivity
     public void onListFragmentLongClickListener(final TopicContent item, final Boolean mFlag, final TopicFragment.OnDialogClick mClickListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         String question = "";
+        final String colorBlack = "#000000";
+        question = mFlag ? getResources().getString(R.string.subscribe_to_topic) : getResources().getString(R.string.unsubscribe_to_topic);
 
-        question = mFlag ? getResources().getString(R.string.subscribe_to_topic) : getResources().getString(R.string.unsubscribe_to_topic_to_topic);
-        builder.setMessage(question)
-                .setTitle("Topic");
+        if (!isOnline()) {
+            question = getResources().getString(R.string.no_internet_connection);
+            builder.setPositiveButton(R.string.subscribe_yes,new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
 
-        builder.setPositiveButton(R.string.subscribe_yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                FirebaseMessaging.getInstance().subscribeToTopic("topic_" + item.getId());
-                mClickListener.onDialogClick(true);
-                MySQLiteHelper db=new MySQLiteHelper(mContext);
-                db.updateTopics(item);
-                //    new Subscribe(barCode, item.getId() + "");
-            }
-        });
-        builder.setNegativeButton(R.string.subscribe_no, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                // User cancelled the dialog
-                mClickListener.onDialogClick(false);
-            }
-        });
+                }
+            });
+        }
+        else {
+            builder.setPositiveButton(R.string.subscribe_yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    FirebaseMessaging.getInstance().subscribeToTopic("topic_" + item.getId());
+
+                    MySQLiteHelper db = new MySQLiteHelper(mContext);
+                    item.setSubscribe(mFlag);
+                    db.updateTopics(item);
+
+                    HashMap<String, String> param = new HashMap<>();
+                    param.put("app", db.getSettings("app"));
+                    param.put("contact", barCode);
+                    param.put("topic", item.getId() + "");
+
+
+                    RequestToHeroku rth = new RequestToHeroku();
+                    rth.HerokuPost(param, "subscribe", new OnMyRequestListener() {
+                        @Override
+                        public void onSuccess(JSONObject valueTrue) {
+                            if (mFlag) {
+                                mClickListener.onDialogClick(true, mContext, item.getColor());
+                            } else mClickListener.onDialogClick(true, mContext, colorBlack);
+                        }
+
+                        @Override
+                        public void onFailure(String value) {
+                            mClickListener.onDialogClick(false, mContext, colorBlack);
+                        }
+                    });
+                }
+            }).setNegativeButton(R.string.subscribe_no, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+        }
+        builder.setMessage(question);
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

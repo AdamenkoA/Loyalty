@@ -2,6 +2,8 @@ package com.example.adamenko.loyalty.Fragments;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -11,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.adamenko.loyalty.Adapters.MyEventsRVA;
 import com.example.adamenko.loyalty.Content.EventContent;
@@ -46,6 +49,7 @@ public class EventsFragment extends Fragment {
     RecyclerView recyclerView;
     private OnListFragmentInteractionListener mListener;
     private MySQLiteHelper db;
+    Context context;
 
     public EventsFragment() {
     }
@@ -74,7 +78,7 @@ public class EventsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_event_list, container, false);
 
         if (view instanceof RecyclerView) {
-            Context context = view.getContext();
+            context = view.getContext();
             recyclerView = (RecyclerView) view;
             if (mColumnCount <= 1) {
                 recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -86,35 +90,48 @@ public class EventsFragment extends Fragment {
             RequestToHeroku rth = new RequestToHeroku();
             db = new MySQLiteHelper(this.getContext());
             param.put("app", db.getSettings("app"));
-            rth.HerokuGet(param, "events", new OnMyRequestListener() {
-                @Override
-                public void onSuccess(JSONObject valueTrue) {
-                    List<EventContent> items = new ArrayList<>();
+            if (isOnline()) {
+                rth.HerokuGet(param, "events", new OnMyRequestListener() {
+                    @Override
+                    public void onSuccess(JSONObject valueTrue) {
+                        List<EventContent> items = new ArrayList<>();
+                        try {
+                            JSONArray cast = valueTrue.getJSONArray("events");
+                            for (int i = 0; i < cast.length(); i++) {
+                                JSONObject actor = cast.getJSONObject(i);
+                                String color = db.getSubscribe(Integer.parseInt(actor.getString("topic_id")), db.getWritableDatabase()) ? db.getTopic(actor.getString("topic_id")).getColor() : "#000000";
+                                EventContent ec = new EventContent(actor.getString("id"), actor.getString("topic_id"),
+                                        DateFormater(actor.getString("date")), actor.getString("time"), actor.getString("title"), actor.getString("description"), color);
 
-                    try {
-                        JSONArray cast = valueTrue.getJSONArray("events");
-                        for (int i = 0; i < cast.length(); i++) {
-                            JSONObject actor = cast.getJSONObject(i);
-                            EventContent ec = new EventContent(actor.getString("id"), actor.getString("topic_id"),
-                                    DateFormater(actor.getString("date")), actor.getString("time"), actor.getString("title"), actor.getString("description"));
-                            db.addEvents(ec);
-                            items.add(ec);
+                                db.addEvents(ec);
 
+                                items.add(ec);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        recyclerView.setAdapter(new MyEventsRVA(items, mListener, context));
+                        RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
+                        recyclerView.addItemDecoration(dividerItemDecoration);
                     }
 
-                    recyclerView.setAdapter(new MyEventsRVA(items, mListener));
-                    RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
-                    recyclerView.addItemDecoration(dividerItemDecoration);
-                }
+                    @Override
+                    public void onFailure(String value) {
+                        Toast.makeText(context,
+                                value, Toast.LENGTH_SHORT).show();
+                        RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
+                        recyclerView.setAdapter(new MyEventsRVA(db.getEvents(), mListener, context));
+                        recyclerView.addItemDecoration(dividerItemDecoration);
+                    }
+                });
+            } else {
+                Toast.makeText(context,
+                        context.getText(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
+                RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
+                recyclerView.setAdapter(new MyEventsRVA(db.getEvents(), mListener, context));
+                recyclerView.addItemDecoration(dividerItemDecoration);
+            }
 
-                @Override
-                public void onFailure(String value) {
-
-                }
-            });
         }
         return view;
     }
@@ -143,7 +160,6 @@ public class EventsFragment extends Fragment {
     private String DateFormater(String date) {
         Date dateE = new Date();
         DateFormat df = new SimpleDateFormat("dd.MM");
-        String string = "January 2, 2010";
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
         try {
             dateE = format.parse(date);
@@ -153,5 +169,12 @@ public class EventsFragment extends Fragment {
         }
 
         return df.format(dateE) + "";
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

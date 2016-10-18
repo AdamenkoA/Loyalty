@@ -31,8 +31,6 @@ public class Subscribe {
                 try {
                     String value = new String(responseBody);
                     JSONObject valueTrue = new JSONObject(value);
-
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

@@ -8,10 +8,6 @@ import com.example.adamenko.loyalty.Content.SettingsContent;
 import com.example.adamenko.loyalty.DataBase.MySQLiteHelper;
 import com.example.adamenko.loyalty.R;
 
-/**
- * Created by Adamenko on 05.10.2016.
- */
-
 public class Test extends AppCompatActivity {
 
     /**
@@ -29,11 +25,10 @@ public class Test extends AppCompatActivity {
         String decryptedStr = "1010101";
         db.addSettings(new SettingsContent(1, "BarCode", decryptedStr));
         db.addSettings(new SettingsContent(2, "app", getString(R.string.app)));
-     //   db.deleteAllEvents();
-     // db.deleteAllTopic();
         Intent myIntent = new Intent(Test.this, Home.class);
         myIntent.putExtra("ITEM_ID", decryptedStr);
         startActivity(myIntent);
+
         finish();
     }
 

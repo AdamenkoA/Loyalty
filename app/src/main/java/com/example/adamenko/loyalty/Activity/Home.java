@@ -61,11 +61,8 @@ public class Home extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        MySQLiteHelper mlh = new MySQLiteHelper(this);
-
-        if (barcode_data.equals("")) {
-            barcode_data = crypter.decrypt(mlh.getSettings("BarCode"));
-        }
+        MySQLiteHelper db = new MySQLiteHelper(this);
+        barcode_data = barcode_data != null && barcode_data.equals("") ? crypter.decrypt(db.getSettings("BarCode")) : db.getSettings("BarCode");
 
         barCode = barcode_data;
         Fragment fragment = null;
@@ -178,14 +175,13 @@ public class Home extends AppCompatActivity
 
         if (!isOnline()) {
             question = getResources().getString(R.string.no_internet_connection);
-            builder.setPositiveButton(R.string.subscribe_yes,new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(R.string.subscribe_yes, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
                 }
             });
-        }
-        else {
+        } else {
             builder.setPositiveButton(R.string.subscribe_yes, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     FirebaseMessaging.getInstance().subscribeToTopic("topic_" + item.getId());
